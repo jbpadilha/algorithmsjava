@@ -8,85 +8,84 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-class Document {
-    String name;
-    String description;
-    String createdBy;
-    String lastModifiedBy;
-    Long sizeInBytes;
-    Long createdTime;
-    Long modifiedTime;
-
-    /**
-     * Method to return the size in Bytes converted String
-     * @param size
-     * @return
-     */
-    public static String convertSize(long size) {
-        String result = String.valueOf(size);
-        if (size > 1024 && size < 1024 * 1024) {
-            result = String.valueOf(size / 1024) + " kb";
-        } else if (size >= 1024 * 1024 && size < 1024 * 1024 * 1024) {
-            result = String.valueOf(size / 1024 / 1024) + " mb";
-        } else if (size >= 1024 * 1024 * 1024) {
-            result = String.valueOf(size / 1024 / 1024 / 1024) + " gb";
-        } else {
-            result = result + " B";
-        }
-        return result;
-    }
-
-    /**
-     * Prints a report of the list of documents in the following format:
-     *
-     * Group by document.createdBy
-     * Sort the groups using document.createdBy ascending, case insensitive
-     *      Sort each sub list of documents by document.createdTime ascending
-     * Format the output of document.size to be a more friendly format. Ex.  50 mb, 900 k, 342 bytes, etc...
-     * Format the dates using the format: yyyy-MM-dd
-     * Format the output of document.description such that
-     *  - no more than the first 25 characters of the description are displayed
-     *  - don't truncate any words unless the first word is longer than 25 characters
-     *  - display "..." at the end of the description to indicate that it has been truncated
-     *  (these three characters do not count as part of the 25 character limit)
-     *
-     * Example:
-     * Andy Andrews
-     *      "Bobby Timmons Biography","An exhaustive look at the ...",233 mb,2013-05-09,2013-05-14
-     *      "Apple Sauce","Study of apple sauces.”,87 gb,2013-05-10,2013-05-10
-     *      "Zed","All matters, A to Zed”,924 k,2013-05-12,2013-05-12
-     * Janet Smith
-     *      "Xray","How the Xray shows your ...",48 mb,2010-10-22,2010-12-02
-     *      "Computers","Inventory list of ...",423 bytes,2013-03-01,2013-02-17
-     *
-     *
-     * @param documents not null
-     */
-
-    public void printDocumentsReport(List<Document> documents) {
-        // First - Sort by CreatedBY
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        Map<String, List<Document>> authorsGrouped = documents.stream().sorted(Comparator.comparing(doc -> doc.createdBy, String.CASE_INSENSITIVE_ORDER)).collect(Collectors.groupingBy(d -> d.createdBy));
-        authorsGrouped.forEach((key,value) -> {
-            System.out.println(key);
-            value.stream().sorted(Comparator.comparing(doc -> doc.createdTime)).forEach(doc -> {
-                LocalDateTime createdIn =
-                        LocalDateTime.ofInstant(Instant.ofEpochMilli(doc.createdTime),
-                                TimeZone.getDefault().toZoneId());
-                LocalDateTime modifiedOn =
-                        LocalDateTime.ofInstant(Instant.ofEpochMilli(doc.modifiedTime),
-                                TimeZone.getDefault().toZoneId());
-                String newDescription = doc.description;
-                if (newDescription.length() > 25) {
-                    newDescription = newDescription.substring(0, 25) + " ...";
-                }
-                System.out.println("     \""+ doc.name + "\", \""+newDescription+"\", "+convertSize(doc.sizeInBytes)+ ", "+createdIn.format(formatter)+ ", "+ modifiedOn.format(formatter));
-            });
-        });
-    }
-}
-
 public class SortedTextSolution {
+    static class Document {
+        String name;
+        String description;
+        String createdBy;
+        String lastModifiedBy;
+        Long sizeInBytes;
+        Long createdTime;
+        Long modifiedTime;
+
+        /**
+         * Method to return the size in Bytes converted String
+         * @param size
+         * @return
+         */
+        public static String convertSize(long size) {
+            String result = String.valueOf(size);
+            if (size > 1024 && size < 1024 * 1024) {
+                result = String.valueOf(size / 1024) + " kb";
+            } else if (size >= 1024 * 1024 && size < 1024 * 1024 * 1024) {
+                result = String.valueOf(size / 1024 / 1024) + " mb";
+            } else if (size >= 1024 * 1024 * 1024) {
+                result = String.valueOf(size / 1024 / 1024 / 1024) + " gb";
+            } else {
+                result = result + " B";
+            }
+            return result;
+        }
+
+        /**
+         * Prints a report of the list of documents in the following format:
+         *
+         * Group by document.createdBy
+         * Sort the groups using document.createdBy ascending, case insensitive
+         *      Sort each sub list of documents by document.createdTime ascending
+         * Format the output of document.size to be a more friendly format. Ex.  50 mb, 900 k, 342 bytes, etc...
+         * Format the dates using the format: yyyy-MM-dd
+         * Format the output of document.description such that
+         *  - no more than the first 25 characters of the description are displayed
+         *  - don't truncate any words unless the first word is longer than 25 characters
+         *  - display "..." at the end of the description to indicate that it has been truncated
+         *  (these three characters do not count as part of the 25 character limit)
+         *
+         * Example:
+         * Andy Andrews
+         *      "Bobby Timmons Biography","An exhaustive look at the ...",233 mb,2013-05-09,2013-05-14
+         *      "Apple Sauce","Study of apple sauces.”,87 gb,2013-05-10,2013-05-10
+         *      "Zed","All matters, A to Zed”,924 k,2013-05-12,2013-05-12
+         * Janet Smith
+         *      "Xray","How the Xray shows your ...",48 mb,2010-10-22,2010-12-02
+         *      "Computers","Inventory list of ...",423 bytes,2013-03-01,2013-02-17
+         *
+         *
+         * @param documents not null
+         */
+
+        public void printDocumentsReport(List<Document> documents) {
+            // First - Sort by CreatedBY
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            Map<String, List<Document>> authorsGrouped = documents.stream().sorted(Comparator.comparing(doc -> doc.createdBy, String.CASE_INSENSITIVE_ORDER)).collect(Collectors.groupingBy(d -> d.createdBy));
+            authorsGrouped.forEach((key,value) -> {
+                System.out.println(key);
+                value.stream().sorted(Comparator.comparing(doc -> doc.createdTime)).forEach(doc -> {
+                    LocalDateTime createdIn =
+                            LocalDateTime.ofInstant(Instant.ofEpochMilli(doc.createdTime),
+                                    TimeZone.getDefault().toZoneId());
+                    LocalDateTime modifiedOn =
+                            LocalDateTime.ofInstant(Instant.ofEpochMilli(doc.modifiedTime),
+                                    TimeZone.getDefault().toZoneId());
+                    String newDescription = doc.description;
+                    if (newDescription.length() > 25) {
+                        newDescription = newDescription.substring(0, 25) + " ...";
+                    }
+                    System.out.println("     \""+ doc.name + "\", \""+newDescription+"\", "+convertSize(doc.sizeInBytes)+ ", "+createdIn.format(formatter)+ ", "+ modifiedOn.format(formatter));
+                });
+            });
+        }
+    }
 
     public static void main(String[] args) {
         long KILOBYTE = 1024L;

@@ -16,7 +16,7 @@ public class MinElementRotatedArray {
 
     // Binary Search solution
     public static String findMinRoundedBinary(int n, int arr[]){
-        if (n == 0 && arr.length == 0) {
+        if (n == 0) {
             return "";
         }
         int low=0;
@@ -52,7 +52,5 @@ public class MinElementRotatedArray {
         } else {
             System.out.println("Failed - Binary Solution");
         }
-
-
     }
 }
